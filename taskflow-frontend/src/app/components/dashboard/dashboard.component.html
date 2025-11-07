@@ -1,0 +1,92 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Top Navigation Bar -->
+  <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Left: Logo -->
+        <div class="flex items-center">
+          <div
+            class="h-10 w-10 bg-blue-500 rounded-lg flex items-center justify-center"
+          >
+            <svg
+              class="h-6 w-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              ></path>
+            </svg>
+          </div>
+          <span class="ml-3 text-xl font-bold text-gray-900 hidden sm:block"
+            >TaskFlow</span
+          >
+        </div>
+
+        <!-- Right: User Menu -->
+        <div class="flex items-center space-x-4">
+          <div class="hidden sm:flex items-center space-x-3">
+            <div class="text-right">
+              <p class="text-sm font-medium text-gray-900">
+                {{ currentUser?.name }}
+              </p>
+              <p class="text-xs text-gray-500 capitalize">
+                {{ currentUser?.role }}
+              </p>
+            </div>
+            <div
+              class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold"
+            >
+              {{ currentUser?.name?.charAt(0)?.toUpperCase() }}
+            </div>
+          </div>
+
+          <button
+            (click)="logout()"
+            class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+            title="Logout"
+          >
+            <svg
+              class="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Welcome Section -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">
+        Welcome back, {{ currentUser?.name }}! 👋
+      </h1>
+      <p class="mt-2 text-gray-600">
+        Here's what's happening with your tasks today.
+      </p>
+    </div>
+
+    <!-- Statistics -->
+    <app-task-stats></app-task-stats>
+
+    <!-- Task List -->
+    <div class="mt-8">
+      <app-task-list></app-task-list>
+    </div>
+  </div>
+</div>
