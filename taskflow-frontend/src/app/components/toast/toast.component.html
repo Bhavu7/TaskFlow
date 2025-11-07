@@ -1,1 +1,39 @@
-<p>toast works!</p>
+<div class="toast-container fixed top-4 right-4 z-50 flex flex-col gap-3">
+  <div
+    *ngFor="let toast of toasts$ | async"
+    [class]="getToastClasses(toast.type)"
+  >
+    <!-- Icon -->
+    <div
+      [class]="getIconClasses(toast.type)"
+      [innerHTML]="getIcon(toast.type)"
+    ></div>
+
+    <!-- Content -->
+    <div class="flex-1">
+      <h4 class="font-semibold text-sm mb-1">{{ toast.title }}</h4>
+      <p class="text-sm opacity-90">{{ toast.message }}</p>
+    </div>
+
+    <!-- Close Button -->
+    <button
+      (click)="removeToast(toast.id)"
+      class="text-gray-400 hover:text-gray-600 transition flex-shrink-0"
+      aria-label="Close"
+    >
+      <svg
+        class="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        ></path>
+      </svg>
+    </button>
+  </div>
+</div>
