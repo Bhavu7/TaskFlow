@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../models/task.model';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-task-form',
@@ -34,7 +35,7 @@ export class TaskFormComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
 
-  constructor(private taskService: TaskService) { }
+  constructor(private taskService: TaskService, private toastService: ToastService) { }
 
   ngOnInit(): void {
     if (this.task) {
@@ -50,7 +51,7 @@ export class TaskFormComponent implements OnInit {
 
   onSubmit(): void {
     if (!this.formData.title.trim()) {
-      this.errorMessage = 'Title is required';
+      this.toastService.warning('Validation Error', 'Title is required');
       return;
     }
 
@@ -69,12 +70,18 @@ export class TaskFormComponent implements OnInit {
     request.subscribe({
       next: () => {
         this.isLoading = false;
+        const action = this.task ? 'updated' : 'created';
+        this.toastService.success(
+          'Success!',
+          `Task ${action} successfully`
+        );
         this.taskSaved.emit();
         this.closeModal();
       },
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = error.error?.message || 'Failed to save task';
+        this.toastService.error('Error', this.errorMessage);
       }
     });
   }
