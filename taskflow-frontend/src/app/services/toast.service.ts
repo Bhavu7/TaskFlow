@@ -16,20 +16,22 @@ export class ToastService {
   }
 
   show(toast: Omit<Toast, 'id'>): void {
+    const duration = toast.duration || 5000;
+
     const newToast: Toast = {
       ...toast,
       id: this.generateId(),
-      duration: toast.duration || 5000
+      duration: duration
     };
 
     const currentToasts = this.toastsSubject.value;
     this.toastsSubject.next([...currentToasts, newToast]);
 
     // Auto remove after duration
-    if (newToast.duration > 0) {
+    if (duration > 0) {
       setTimeout(() => {
         this.remove(newToast.id);
-      }, newToast.duration);
+      }, duration);
     }
   }
 
