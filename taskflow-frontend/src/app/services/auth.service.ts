@@ -39,6 +39,17 @@ export class AuthService {
     );
   }
 
+  // Update user profile
+  updateProfile(data: { name: string; email: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/profile`, data).pipe(
+      tap(response => {
+        if (response.user) {
+          this.storageService.saveUser(response.user);
+        }
+      })
+    );
+  }
+
   // Logout user
   logout(): void {
     this.storageService.clear();
@@ -69,5 +80,15 @@ export class AuthService {
   isAdmin(): boolean {
     const user = this.getUser();
     return user?.role === 'admin';
+  }
+
+  // Change password
+  changePassword(data: { currentPassword: string; newPassword: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/password`, data);
+  }
+
+  // Update stored user (helper method)
+  updateStoredUser(user: User): void {
+    this.storageService.saveUser(user);
   }
 }
