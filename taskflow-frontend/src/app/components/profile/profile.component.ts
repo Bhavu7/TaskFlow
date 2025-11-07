@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../models/user.model';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-profile',
@@ -14,7 +15,7 @@ import { User } from '../../models/user.model';
 })
 export class ProfileComponent implements OnInit {
   user: User | null = null;
-  
+
   profileForm = {
     name: '',
     email: ''
@@ -28,10 +29,10 @@ export class ProfileComponent implements OnInit {
 
   isEditingProfile = false;
   isChangingPassword = false;
-  
+
   profileLoading = false;
   passwordLoading = false;
-  
+
   profileMessage = '';
   profileError = '';
   passwordMessage = '';
@@ -39,7 +40,8 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -67,28 +69,21 @@ export class ProfileComponent implements OnInit {
 
   updateProfile(): void {
     this.profileLoading = true;
-    this.profileMessage = '';
-    this.profileError = '';
 
     this.authService.updateProfile(this.profileForm).subscribe({
       next: (response) => {
         this.profileLoading = false;
-        this.profileMessage = 'Profile updated successfully!';
+        this.toastService.success('Profile Updated', 'Your profile has been updated successfully');
         this.isEditingProfile = false;
-        
-        // Update stored user data
+
         if (response.user) {
           this.authService.updateStoredUser(response.user);
           this.user = response.user;
         }
-
-        setTimeout(() => {
-          this.profileMessage = '';
-        }, 3000);
       },
       error: (error) => {
         this.profileLoading = false;
-        this.profileError = error.error?.message || 'Failed to update profile';
+        this.toastService.error('Update Failed', error.error?.message || 'Failed to update profile');
       }
     });
   }
@@ -105,15 +100,12 @@ export class ProfileComponent implements OnInit {
   }
 
   changePassword(): void {
-    // Validate passwords match
     if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
-      this.passwordError = 'New passwords do not match';
+      this.toastService.warning('Validation Error', 'New passwords do not match');
       return;
     }
 
     this.passwordLoading = true;
-    this.passwordMessage = '';
-    this.passwordError = '';
 
     const data = {
       currentPassword: this.passwordForm.currentPassword,
@@ -123,21 +115,17 @@ export class ProfileComponent implements OnInit {
     this.authService.changePassword(data).subscribe({
       next: (response) => {
         this.passwordLoading = false;
-        this.passwordMessage = 'Password changed successfully!';
+        this.toastService.success('Password Changed', 'Your password has been changed successfully');
         this.passwordForm = {
           currentPassword: '',
           newPassword: '',
           confirmPassword: ''
         };
-
-        setTimeout(() => {
-          this.isChangingPassword = false;
-          this.passwordMessage = '';
-        }, 2000);
+        this.isChangingPassword = false;
       },
       error: (error) => {
         this.passwordLoading = false;
-        this.passwordError = error.error?.message || 'Failed to change password';
+        this.toastService.error('Change Failed', error.error?.message || 'Failed to change password');
       }
     });
   }
