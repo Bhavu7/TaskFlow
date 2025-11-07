@@ -5,6 +5,7 @@ import { TaskService } from '../../services/task.service';
 import { AuthService } from '../../services/auth.service';
 import { Task, TaskFilters } from '../../models/task.model';
 import { TaskFormComponent } from '../task-form/task-form.component';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-task-list',
@@ -29,7 +30,8 @@ export class TaskListComponent implements OnInit {
 
   constructor(
     private taskService: TaskService,
-    public authService: AuthService
+    public authService: AuthService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -80,12 +82,12 @@ export class TaskListComponent implements OnInit {
     if (confirm('Are you sure you want to delete this task?')) {
       this.taskService.deleteTask(id).subscribe({
         next: () => {
-          console.log('Task deleted');
+          this.toastService.success('Task Deleted', 'Task has been deleted successfully');
           this.loadTasks();
         },
         error: (error) => {
           console.error('Error deleting task:', error);
-          alert('Failed to delete task');
+          this.toastService.error('Delete Failed', 'Failed to delete task. Please try again.');
         }
       });
     }
