@@ -133,4 +133,113 @@ const getCurrentUser = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getCurrentUser };
+// Update user profile
+const updateProfile = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: errors.array(),
+      });
+    }
+
+    const userId = req.user.id;
+    const { name, email } = req.body;
+
+    // Check if email is already taken by another user
+    const [existingUsers] = await db.query(
+      "SELECT id FROM users WHERE email = ? AND id != ?",
+      [email, userId]
+    );
+
+    if (existingUsers.length > 0) {
+      return res.status(400).json({
+        message: "Email is already taken by another user",
+      });
+    }
+
+    // Update user
+    await db.query("UPDATE users SET name = ?, email = ? WHERE id = ?", [
+      name,
+      email,
+      userId,
+    ]);
+
+    // Get updated user
+    const [users] = await db.query(
+      "SELECT id, name, email, role, created_at FROM users WHERE id = ?",
+      [userId]
+    );
+
+    res.json({
+      message: "Profile updated successfully",
+      user: users[0],
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({
+      message: "Server error updating profile",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
+// Change password
+const changePassword = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: errors.array(),
+      });
+    }
+
+    const userId = req.user.id;
+    const { currentPassword, newPassword } = req.body;
+
+    // Get user with password
+    const [users] = await db.query("SELECT password FROM users WHERE id = ?", [
+      userId,
+    ]);
+
+    if (users.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      users[0].password
+    );
+
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        message: "Current password is incorrect",
+      });
+    }
+
+    // Hash new password
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    // Update password
+    await db.query("UPDATE users SET password = ? WHERE id = ?", [
+      hashedPassword,
+      userId,
+    ]);
+
+    res.json({
+      message: "Password changed successfully",
+    });
+  } catch (error) {
+    console.error("Change password error:", error);
+    res.status(500).json({
+      message: "Server error changing password",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
+module.exports = { register, login, getCurrentUser, updateProfile, changePassword };
