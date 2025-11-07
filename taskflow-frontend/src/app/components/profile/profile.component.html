@@ -1,0 +1,276 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8 flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Profile Settings</h1>
+        <p class="mt-2 text-gray-600">Manage your account information</p>
+      </div>
+      <button
+        (click)="goBack()"
+        class="px-4 py-2 text-gray-600 hover:text-gray-900 transition"
+      >
+        <svg
+          class="h-6 w-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Profile Information Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold text-gray-900">
+            Profile Information
+          </h2>
+          <button
+            *ngIf="!isEditingProfile"
+            (click)="toggleEditProfile()"
+            class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition font-medium"
+          >
+            Edit Profile
+          </button>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <!-- Success Message -->
+        <div
+          *ngIf="profileMessage"
+          class="mb-4 bg-green-50 border-l-4 border-green-500 p-4 rounded"
+        >
+          <p class="text-sm text-green-700">{{ profileMessage }}</p>
+        </div>
+
+        <!-- Error Message -->
+        <div
+          *ngIf="profileError"
+          class="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded"
+        >
+          <p class="text-sm text-red-700">{{ profileError }}</p>
+        </div>
+
+        <!-- View Mode -->
+        <div *ngIf="!isEditingProfile" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1"
+              >Name</label
+            >
+            <p class="text-lg text-gray-900">{{ user?.name }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1"
+              >Email</label
+            >
+            <p class="text-lg text-gray-900">{{ user?.email }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1"
+              >Role</label
+            >
+            <span
+              class="inline-flex px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 capitalize"
+            >
+              {{ user?.role }}
+            </span>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1"
+              >Member Since</label
+            >
+            <p class="text-lg text-gray-900">
+              {{ user?.created_at | date : "mediumDate" }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Edit Mode -->
+        <form
+          *ngIf="isEditingProfile"
+          (ngSubmit)="updateProfile()"
+          #profileFormEl="ngForm"
+          class="space-y-4"
+        >
+          <div>
+            <label
+              for="name"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Name</label
+            >
+            <input
+              id="name"
+              name="name"
+              type="text"
+              [(ngModel)]="profileForm.name"
+              required
+              minlength="2"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label
+              for="email"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Email</label
+            >
+            <input
+              id="email"
+              name="email"
+              type="email"
+              [(ngModel)]="profileForm.email"
+              required
+              email
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div class="flex space-x-3 pt-4">
+            <button
+              type="submit"
+              [disabled]="!profileFormEl.form.valid || profileLoading"
+              class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-50"
+            >
+              {{ profileLoading ? "Saving..." : "Save Changes" }}
+            </button>
+            <button
+              type="button"
+              (click)="toggleEditProfile()"
+              class="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition font-medium"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Change Password Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold text-gray-900">Change Password</h2>
+          <button
+            *ngIf="!isChangingPassword"
+            (click)="toggleChangePassword()"
+            class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition font-medium"
+          >
+            Change Password
+          </button>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <!-- Success Message -->
+        <div
+          *ngIf="passwordMessage"
+          class="mb-4 bg-green-50 border-l-4 border-green-500 p-4 rounded"
+        >
+          <p class="text-sm text-green-700">{{ passwordMessage }}</p>
+        </div>
+
+        <!-- Error Message -->
+        <div
+          *ngIf="passwordError"
+          class="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded"
+        >
+          <p class="text-sm text-red-700">{{ passwordError }}</p>
+        </div>
+
+        <div *ngIf="!isChangingPassword" class="text-gray-600">
+          <p>Click "Change Password" to update your password</p>
+        </div>
+
+        <!-- Change Password Form -->
+        <form
+          *ngIf="isChangingPassword"
+          (ngSubmit)="changePassword()"
+          #passwordFormEl="ngForm"
+          class="space-y-4"
+        >
+          <div>
+            <label
+              for="currentPassword"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Current Password
+            </label>
+            <input
+              id="currentPassword"
+              name="currentPassword"
+              type="password"
+              [(ngModel)]="passwordForm.currentPassword"
+              required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label
+              for="newPassword"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              New Password
+            </label>
+            <input
+              id="newPassword"
+              name="newPassword"
+              type="password"
+              [(ngModel)]="passwordForm.newPassword"
+              required
+              minlength="6"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <p class="mt-1 text-xs text-gray-500">
+              Must be at least 6 characters
+            </p>
+          </div>
+
+          <div>
+            <label
+              for="confirmPassword"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Confirm New Password
+            </label>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              [(ngModel)]="passwordForm.confirmPassword"
+              required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div class="flex space-x-3 pt-4">
+            <button
+              type="submit"
+              [disabled]="!passwordFormEl.form.valid || passwordLoading"
+              class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-50"
+            >
+              {{ passwordLoading ? "Changing..." : "Change Password" }}
+            </button>
+            <button
+              type="button"
+              (click)="toggleChangePassword()"
+              class="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition font-medium"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
