@@ -3,6 +3,7 @@ export interface User {
   name: string;
   email: string;
   role: 'user' | 'admin';
+  created_at?: string;
 }
 
 export interface LoginRequest {
@@ -14,6 +15,7 @@ export interface RegisterRequest {
   name: string;
   email: string;
   password: string;
+  role?: 'user' | 'admin';
 }
 
 export interface AuthResponse {

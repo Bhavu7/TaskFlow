@@ -8,7 +8,8 @@ import {
   LoginRequest,
   RegisterRequest,
   AuthResponse,
-  User
+  User,
+  UpdateProfileResponse
 } from '../models/user.model';
 
 @Injectable({
@@ -40,8 +41,8 @@ export class AuthService {
   }
 
   // Update user profile
-  updateProfile(data: { name: string; email: string }): Observable<any> {
-    return this.http.put(`${this.apiUrl}/profile`, data).pipe(
+  updateProfile(data: { name: string; email: string }): Observable<UpdateProfileResponse> {
+    return this.http.put<UpdateProfileResponse>(`${this.apiUrl}/profile`, data).pipe(
       tap(response => {
         if (response.user) {
           this.storageService.saveUser(response.user);
